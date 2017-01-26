@@ -1,2 +1,1 @@
-# cpp-review
-This repository will review basic data structures, such as linked lists, and algorithms implemented in C+.
+This repository will review basic data structures and algorithms implemented in C++. It is used for personal study.
