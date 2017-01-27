@@ -1,3 +1,3 @@
 # cpp-review
 
-This repository will review basic data structures and algorithms implemented in C++. It is used for personal study.
+This repository contains code on basic data structures and algorithms implemented in C++. This is meant to be used for educational purposes.
