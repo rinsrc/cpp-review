@@ -15,6 +15,21 @@ public:
 		front = nullptr;
 		back = nullptr;
 	}
+	
+	// constructor
+	~DLL() {
+		Node<T> *temp;
+		Node<T> *frontPtr = front;
+		
+		// delete each node in list
+		while(frontPtr != nullptr) {
+			temp = frontPtr;
+			frontPtr = frontPtr->getNext();
+			delete temp;
+		}
+
+		std::cout << "List is deleted." << std::endl;
+	}
 
 	// basic double linked list functions
 	void insertAtFront(T d);

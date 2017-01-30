@@ -27,6 +27,6 @@ int main() {
 	// reprint list with deleted values
 	std::cout << std::endl << "Reprinted list with first and last nodes deleted:" << std::endl;
 	myList->print();
-	
+
 	return 0;
 }
