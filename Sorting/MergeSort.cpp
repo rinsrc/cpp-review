@@ -2,15 +2,15 @@
 #include <ctime>
 
 // merge function, pass in original array, an auxiliary array, 
-// and the low, high, and mid index
+// and the start, end, and mid index
 // this function sorts and merges the arrays
-void merge(int a[], int aux[], int low, int high, int mid) {
-	int i = low; // start position of left subarray
+void merge(int a[], int aux[], int start, int end, int mid) {
+	int i = start; // start position of left subarray
 	int j = mid + 1; // start position of right subarray
-	int k = low; // start position for aux array
+	int k = start; // start position for aux array
 
 	// sort array a and copy to aux
-	while(i <= mid && j <= high) {
+	while(i <= mid && j <= end) {
 		// if left subarray's value is smaller, copy to aux
 		if(a[i] < a[j]) {
 			aux[k] = a[i];
@@ -34,7 +34,7 @@ void merge(int a[], int aux[], int low, int high, int mid) {
 		i++;
 	}
 
-	while(j <= high) {
+	while(j <= end) {
 		aux[k] = a[j];
 		k++;
 		j++;
@@ -42,26 +42,26 @@ void merge(int a[], int aux[], int low, int high, int mid) {
 
 	// aux array should now be sorted from smallest to largest
 	// copy all elements of aux to a
-	for(int i = low; i < k; i++) {
+	for(int i = start; i < k; i++) {
 		a[i] = aux[i];
 	}
 }
 
 // this function recursively breaks the array by calling merge
-void mergeSort(int a[], int aux[], int low, int high) {
+void mergeSort(int a[], int aux[], int start, int end) {
 	// break out of recursion once you can't break array any further 
-	if(high <= low) {
+	if(end <= start) {
 		return;
 	}
 
 	// calculate mid index
-	int mid = low + (high - low) / 2;
+	int mid = start + (end - start) / 2;
 
 	// recursively break and sort array
-	mergeSort(a, aux, low, mid); // left subarray
-	mergeSort(a, aux, mid+1, high); // right subarray
+	mergeSort(a, aux, start, mid); // left subarray
+	mergeSort(a, aux, mid+1, end); // right subarray
 
-	merge(a, aux, low, high, mid); // merge and sort back together
+	merge(a, aux, start, end, mid); // merge and sort back together
 }
 
 void printArray(int a[], int arraySize) {
