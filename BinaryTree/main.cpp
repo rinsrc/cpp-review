@@ -6,6 +6,15 @@ int main() {
 	int numOfNodes = 0;
 	int numOfLeaves = 0;
 
+	/* 
+		tree should look like this:
+			  0
+		    /    \
+		  1       2
+		 /  \    /  \
+		3	4	5	 6
+	*/
+
 	for(int i = 0; i < 7; i++) {
 		tree->insert(i);
 	}
@@ -39,9 +48,18 @@ int main() {
 	std::cout << "Mirroring tree: "<< std::endl;
 	tree->mirror(tree->getRoot());
 	tree->print(tree->getRoot());
+	
+	/* 
+		mirrored tree should now look like this:
+			  0
+		    /    \
+		   2      1
+		 /  \    /  \
+		6	 5	4	 3
+	*/
 
 	// printing path from 2nd left child to root
-	BTNode<int>* p = tree->getRoot()->getLeftChild()->getLeftChild();
+	BTNode<int>* p = tree->getRoot()->getLeft()->getLeft();
 	std::cout << std::endl << std::endl;
 	std::cout << "The value/data of 2nd left child is " << p->getData() << "." << std::endl;
 	std::cout << "Printing path from root to 2nd left child: " << std::endl;
@@ -53,12 +71,30 @@ int main() {
 	tree->swim(p);
 	tree->print(tree->getRoot());
 
+	/* 
+		after swimming 2nd left child, tree should look like this:
+			  6
+		    /    \
+		   0      1
+		 /  \    /  \
+		2	 5	4	 3
+	*/
+
 	// sink node down tree
 	std::cout << std::endl << std::endl;
-	BTNode<int> *rightChild = tree->getRoot()->getRightChild();
+	BTNode<int> *rightChild = tree->getRoot()->getRight();
 	std::cout << "Sinking 1st right child (data value = " << rightChild->getData() << ") down tree:" << std::endl;
 	tree->sink(rightChild);
 	tree->print(tree->getRoot());
+
+	/* 
+		after sinking 1st right child of root, tree should look like this:
+			  6
+		    /    \
+		   0      4
+		 /  \    /  \
+		2	 5	1	 3
+	*/
 
 	// copy tree
 	std::cout << std::endl << std::endl;

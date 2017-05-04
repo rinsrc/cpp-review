@@ -7,24 +7,24 @@ class BTNode {
 private:
 	T data; // value of node
 	BTNode<T> *parent;
-	BTNode<T> *leftChild;
-	BTNode<T> *rightChild;
+	BTNode<T> *left;
+	BTNode<T> *right;
 
 public:
 	// basic constructor where all pointers are initially set to nullptr
 	BTNode() {
-		parent = leftChild = rightChild = nullptr;
+		parent = left = right = nullptr;
 	}
 
 	// get/set functions
 	T getData();
 	BTNode<T> *getParent();
-	BTNode<T> *getLeftChild();
-	BTNode<T> *getRightChild();
+	BTNode<T> *getLeft();
+	BTNode<T> *getRight();
 	void setData(T d);
 	void setParent(BTNode<T> *p);
-	void setLeftChild(BTNode<T> *lc);
-	void setRightChild(BTNode<T> *rc);
+	void setLeft(BTNode<T> *l);
+	void setRight(BTNode<T> *r);
 };
 
 template<class T>
@@ -38,13 +38,13 @@ BTNode<T>* BTNode<T>::getParent() {
 }
 
 template<class T>
-BTNode<T>* BTNode<T>::getLeftChild() {
-	return leftChild;
+BTNode<T>* BTNode<T>::getLeft() {
+	return left;
 }
 
 template<class T>
-BTNode<T>* BTNode<T>::getRightChild() {
-	return rightChild;
+BTNode<T>* BTNode<T>::getRight() {
+	return right;
 }
 
 template<class T>
@@ -58,13 +58,13 @@ void BTNode<T>::setParent(BTNode<T> *p) {
 }
 
 template<class T>
-void BTNode<T>::setLeftChild(BTNode<T> *lc) {
-	leftChild = lc;
+void BTNode<T>::setLeft(BTNode<T> *l) {
+	left= l;
 }
 
 template<class T>
-void BTNode<T>::setRightChild(BTNode<T> *rc) {
-	rightChild = rc;
+void BTNode<T>::setRight(BTNode<T> *r) {
+	right = r;
 }
 
 #endif

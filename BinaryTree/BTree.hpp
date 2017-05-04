@@ -69,8 +69,8 @@ BTNode<T>* BTree<T>::insert(T d) {
 		q.pop(); // pop first node
 
 		// if there is a left child node, push into queue
-		if(currNode->getLeftChild() != nullptr) {
-			q.push(currNode->getLeftChild());
+		if(currNode->getLeft() != nullptr) {
+			q.push(currNode->getLeft());
 		}
 
 		// else, insert new node at the left b/c it is empty
@@ -78,13 +78,13 @@ BTNode<T>* BTree<T>::insert(T d) {
 			BTNode<T> *nn = new BTNode<T>(); // create a new node
 			nn->setData(d); // change data
 			nn->setParent(currNode); // make currNode the parent
-			currNode->setLeftChild(nn); // make sure next node of parent is also connected
+			currNode->setLeft(nn); // make sure next node of parent is also connected
 			return nn; // return pointer to newly created node
 		}
 
 		// if there is a right child node, push into queue
-		if(currNode->getRightChild() != nullptr) {
-			q.push(currNode->getRightChild());
+		if(currNode->getRight() != nullptr) {
+			q.push(currNode->getRight());
 		}
 
 		// else, insert new node at the right b/c it is empty
@@ -92,7 +92,7 @@ BTNode<T>* BTree<T>::insert(T d) {
 			BTNode<T> *nn = new BTNode<T>(); // create a new node
 			nn->setData(d); // change data
 			nn->setParent(currNode); // make currNode the parent
-			currNode->setRightChild(nn);
+			currNode->setRight(nn);
 			return nn; // return pointer to newly created node
 		}
 	}
@@ -110,13 +110,13 @@ void BTree<T>::print(BTNode<T> *p) {
 		std::cout << currNode->getData() << " "; // print out data
 
 		// if there is a node left of p, push into queue
-		if(currNode->getLeftChild() != nullptr) {
-			q.push(currNode->getLeftChild());
+		if(currNode->getLeft() != nullptr) {
+			q.push(currNode->getLeft());
 		}
 
 		// if there is a node right of p, push into queue
-		if(currNode->getRightChild()!= nullptr) {
-			q.push(currNode->getRightChild());
+		if(currNode->getRight()!= nullptr) {
+			q.push(currNode->getRight());
 		}
 	}
 }
@@ -128,8 +128,8 @@ void BTree<T>::nodeCount(BTNode<T> *p, int &counter) {
 		return;
 	}
 
-	nodeCount(p->getLeftChild(), counter);
-	nodeCount(p->getRightChild(), counter);
+	nodeCount(p->getLeft(), counter);
+	nodeCount(p->getRight(), counter);
 	counter++;
 }
 
@@ -145,8 +145,8 @@ int BTree<T>::depth(BTNode<T> *p) {
 
 	else {
 		// recursively calculate the depth of left and right subtrees
-		depthLeft = depth(p->getLeftChild());
-		depthRight = depth(p->getRightChild());
+		depthLeft = depth(p->getLeft());
+		depthRight = depth(p->getRight());
 
 		// find max of left and right depths and add 1 to it for total depth
 		if(depthLeft > depthRight) {
@@ -165,12 +165,12 @@ int BTree<T>::depth(BTNode<T> *p) {
 template<class T>
 void BTree<T>::countLeaves(BTNode<T> *p, int &counter) {
 	if(p != nullptr) {
-		if(p->getLeftChild() == nullptr && p->getRightChild() == nullptr) {
+		if(p->getLeft() == nullptr && p->getRight() == nullptr) {
 			counter++;
 		}
 
-		countLeaves(p->getLeftChild(), counter);
-		countLeaves(p->getRightChild(), counter);
+		countLeaves(p->getLeft(), counter);
+		countLeaves(p->getRight(), counter);
 	}
 }
 
@@ -187,7 +187,7 @@ bool BTree<T>::check(BTNode<T> *p, T target) {
 	}
 
 	// recursively check left and right subtree to see if target exists and return true/false
-	return check(p->getLeftChild(), target) || check(p->getRightChild(), target);
+	return check(p->getLeft(), target) || check(p->getRight(), target);
 }
 
 // creates a mirror of the tree
@@ -198,13 +198,13 @@ void BTree<T>::mirror(BTNode<T>* p) {
 	}
 
 	else {
-		mirror(p->getLeftChild());
-		mirror(p->getRightChild());
+		mirror(p->getLeft());
+		mirror(p->getRight());
 
 		// swap positions to mirror tree
-		BTNode<T>* temp = p->getLeftChild(); // create a temp node that stores left child
-		p->setLeftChild(p->getRightChild()); // set left child to c's right child
-		p->setRightChild(temp); // change c's right child to temp
+		BTNode<T>* temp = p->getLeft(); // create a temp node that stores left child
+		p->setLeft(p->getRight()); // set left child to c's right child
+		p->setRight(temp); // change c's right child to temp
 	}
 }
 
@@ -246,21 +246,21 @@ void BTree<T>::swim(BTNode<T> *p) {
 template<class T>
 void BTree<T>::sink(BTNode<T> *p) {
 	// swap values so long as p is smaller than left or right child
-	while(p->getLeftChild() != nullptr || p->getRightChild() != nullptr) {
+	while(p->getLeft() != nullptr || p->getRight() != nullptr) {
 		// if left child value is bigger than p, swap and move left
-		if(p->getLeftChild()->getData() >= p->getRightChild()->getData()) {
+		if(p->getLeft()->getData() >= p->getRight()->getData()) {
 			T temp = p->getData();
-			p->setData(p->getLeftChild()->getData());
-			p->getLeftChild()->setData(temp);
-			p = p->getLeftChild();
+			p->setData(p->getLeft()->getData());
+			p->getLeft()->setData(temp);
+			p = p->getLeft();
 		}
 
 		// if right child value is bigger than p, swap and move right
-		else if(p->getLeftChild()->getData() <= p->getRightChild()->getData()) {
+		else if(p->getLeft()->getData() <= p->getRight()->getData()) {
 			T temp = p->getData();
-			p->setData(p->getRightChild()->getData());
-			p->getRightChild()->setData(temp);
-			p = p->getRightChild();
+			p->setData(p->getRight()->getData());
+			p->getRight()->setData(temp);
+			p = p->getRight();
 		}
 
 		else {
@@ -280,22 +280,22 @@ void BTree<T>::copyTree(BTree<T> *t, BTNode<T> *p) {
 	}
 
 	// recursively build left child and right child
-	copyTree(t, p->getLeftChild());
-	copyTree(t, p->getRightChild());
+	copyTree(t, p->getLeft());
+	copyTree(t, p->getRight());
 
 	nn = new BTNode<T>();
 	t->setRoot(nn);
 	nn->setData(p->getData());
-	nn->setLeftChild(p->getLeftChild());
-	nn->setRightChild(p->getRightChild());
+	nn->setLeft(p->getLeft());
+	nn->setRight(p->getRight());
 }
 
 // deletes tree from bottom up
 template<class T>
 void BTree<T>::deleteTree(BTNode<T> *p) {
 	if(p != nullptr) {
-		deleteTree(p->getLeftChild());
-		deleteTree(p->getRightChild());
+		deleteTree(p->getLeft());
+		deleteTree(p->getRight());
 		delete p;
 	}
 }
