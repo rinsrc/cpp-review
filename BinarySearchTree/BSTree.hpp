@@ -332,7 +332,7 @@ bool BSTree<K, V>::isBST(BSTNode<K, V>* p) {
 	return true;
 }
 
-// prints binary tree (pass in root to print entire tree) using level order scan/travesal
+// prints binary tree (pass in root to print entire tree) using inorder scan/travesal
 template<class K, class V>
 void BSTree<K, V>::print(BSTNode<K, V> *p) {
 	std::queue<BSTNode<K, V>*> q; // this queue will store pointers of tree
