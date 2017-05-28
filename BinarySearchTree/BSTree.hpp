@@ -256,12 +256,15 @@ BSTNode<K, V>* BSTree<K, V>::deleteKey(BSTNode<K, V> *p, K k) {
 
 		// case 4 (two children)
 		else {
-			// find smallest key in right subtree
+			// find smallest key in right subtree (inorder successor)
 			BSTNode<K, V> *temp = minNode(p->getRight());
-			temp->getParent()->setLeft(nullptr);
+
 			p->setKey(temp->getKey());
 			p->setValue(temp->getValue());
-			delete temp;
+			std::cout << "X: " << temp->getKey() << std::endl;
+
+			// set p's right by recursively deleting node again (will either have one or no child)
+			p->setRight(deleteKey(p->getRight(), temp->getKey()));
 		}
 
 		return p;
@@ -279,12 +282,17 @@ BSTNode<K, V>* BSTree<K, V>::getSucc(BSTNode<K, V> *p) {
 	// else there are NO nodes to right of tree
 	else {
 		BSTNode<K, V> *n = p->getParent();
-
-		while(n != nullptr && p == n->getRight()) {
-			p = n;
-			n = p->getParent();
+		if(n == nullptr) {
+			return nullptr;
 		}
-		return n;
+
+		else {
+			while(n != nullptr && p == n->getRight()) {
+				p = n;
+				n = p->getParent();
+			}
+			return n;
+		}
 	}
 }
 
@@ -332,7 +340,7 @@ bool BSTree<K, V>::isBST(BSTNode<K, V>* p) {
 	return true;
 }
 
-// prints binary tree (pass in root to print entire tree) using inorder scan/travesal
+// prints binary tree (pass in root to print entire tree) using level order scan/travesal
 template<class K, class V>
 void BSTree<K, V>::print(BSTNode<K, V> *p) {
 	std::queue<BSTNode<K, V>*> q; // this queue will store pointers of tree
