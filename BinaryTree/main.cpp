@@ -1,6 +1,9 @@
 #include <iostream>
 #include "BTree.hpp"
 
+// NOTE: This binary tree is NOT a Binary Search Tree
+// It will insert nodes into tree starting from leftmost
+
 int main() {
 	BTree<int> *tree = new BTree<int>();
 	int numOfNodes = 0;

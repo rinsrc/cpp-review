@@ -104,6 +104,10 @@ AVLNode<T>* AVLTree<T>::leftRotate(AVLNode<T> *p) {
 		b->setParent(p);
 	}
 
+	if(parentOfP != nullptr) {
+		parentOfP->setRight(a);
+	}
+
 	// check to see if p is root
 	if(p == root) {
 		root = a;
@@ -136,6 +140,10 @@ AVLNode<T>* AVLTree<T>::rightRotate(AVLNode<T> *p) {
 
 	if(b != nullptr) {
 		b->setParent(p);
+	}
+	
+	if(parentOfP != nullptr) {
+		parentOfP->setLeft(a);
 	}
 
 	// check to see if p is root

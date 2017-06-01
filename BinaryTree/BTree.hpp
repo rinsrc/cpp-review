@@ -98,7 +98,7 @@ BTNode<T>* BTree<T>::insert(T d) {
 	}
 }
 
-// prints binary tree (pass in root to print entire tree) using inorder scan/travesal
+// prints binary tree (pass in root to print entire tree) using level order scan/travesal
 template<class T>
 void BTree<T>::print(BTNode<T> *p) {
 	std::queue<BTNode<T>*> q; // this queue will store pointers of tree
