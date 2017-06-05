@@ -8,27 +8,30 @@ template<class T>
 class RBTree {
 private:
 	RBTNode<T> *root;
-	int blackHeight; // height of black nodes in tree
 
 public:
 	// constructor
 	RBTree() {
 		root = nullptr;
-		blackHeight = 0;
+	}
+
+	// destructor
+	~RBTree() {
+		deleteTree(root);
+		root = nullptr;
 	}
 
 	RBTNode<T> *getRoot();
-	void incBlackHeight();
-	void decBlackHeight();
 	RBTNode<T> *leftRotate(RBTNode<T> *p);
 	RBTNode<T> *rightRotate(RBTNode<T> *p);
 	void insert(RBTNode<T> *p, T d);
-	void fixTree(RBTNode<T> *p);
+	void fixTreeInsertion(RBTNode<T> *p);
 	RBTNode<T> *minNode(RBTNode<T> *p);
 	RBTNode<T>* getSucc(RBTNode<T> *p);
 	void deleteNode(T d);
 	void fixTreeDeletion(RBTNode<T> *p);
-	void print(RBTNode<T> *p);
+	void print();
+	void deleteTree(AVLNode<T> *p);
 };
 
 template<class T>
@@ -36,25 +39,23 @@ RBTNode<T>* RBTree<T>::getRoot() {
 	return root;
 }
 
-// increases black height by 1
-template<class T>
-void RBTree<T>::incBlackHeight() {
-	blackHeight++;
-}
-
-// decreases black height by 1
-template<class T>
-void RBTree<T>::decBlackHeight() {
-	blackHeight--;
-}
-
+// rotates nodes to left subtree
+/* example (t1, t2, and t3 are other subtrees):
+		p 						a
+	   / \					   / \	
+	  t1  a 				  p  t2
+		 / \				 / \   \	
+		b   t2				t1  b   t3
+			 \
+			 t3
+*/
 template<class T>
 RBTNode<T>* RBTree<T>::leftRotate(RBTNode<T> *p) {
 	RBTNode<T> *a = p->getRight();
 	RBTNode<T> *b = a->getLeft();
 	RBTNode<T> *parentOfP = p->getParent();
 
-	// rotate nodes
+	// rotate nodes by rearranging pointers
 	p->setRight(b);
 	p->setParent(a);
 	a->setParent(parentOfP);
@@ -64,13 +65,16 @@ RBTNode<T>* RBTree<T>::leftRotate(RBTNode<T> *p) {
 		b->setParent(p);
 	}
 
-	if(parentOfP != nullptr) {
+	if(parentOfP == nullptr) {
+		root = a;
+	}
+
+	else if(parentOfP->getRight() == p) {
 		parentOfP->setRight(a);
 	}
 
-	// check to see if p is root
-	if(p == root) {
-		root = a;
+	else {
+		parentOfP->setLeft(a);
 	}
 
 	return a;
@@ -92,7 +96,7 @@ RBTNode<T>* RBTree<T>::rightRotate(RBTNode<T> *p) {
 	RBTNode<T> *b = a->getRight();
 	RBTNode<T> *parentOfP = p->getParent();
 
-	// rotate nodes
+	// rotate nodes by rearranging pointers
 	p->setParent(a);
 	p->setLeft(b);
 	a->setRight(p);
@@ -102,13 +106,16 @@ RBTNode<T>* RBTree<T>::rightRotate(RBTNode<T> *p) {
 		b->setParent(p);
 	}
 
-	if(parentOfP != nullptr) {
-		parentOfP->setLeft(a);
+	if(parentOfP == nullptr) {
+		root = a;
 	}
 
-	// check to see if p is root
-	if(p == root) {
-		root = a;
+	else if(parentOfP->getRight() == p) {
+		parentOfP->setRight(a);
+	}
+
+	else {
+		parentOfP->setLeft(a);
 	}
 
 	return a;
@@ -125,7 +132,6 @@ void RBTree<T>::insert(RBTNode<T> *p, T d) {
 		n->setData(d);
 		n->setIsRed(false); // make root node black
 		root = n;
-		incBlackHeight(); // increase black height of tree by 1 (root is black)
 	}
 
 	else {
@@ -167,14 +173,14 @@ void RBTree<T>::insert(RBTNode<T> *p, T d) {
 		}
 	}
 
-	// fix the newly inserted node
-	fixTree(n);
+	// fix the newly inserted node by recoloring/rotation
+	fixTreeInsertion(n);
 }
 
-// p is newly inserted node n from above BSTInsert function
+// pass newly inserted node n from above insert function
 // check aunt/uncle node to fix insertion
 template<class T>
-void RBTree<T>::fixTree(RBTNode<T> *p) {
+void RBTree<T>::fixTreeInsertion(RBTNode<T> *p) {
 	RBTNode<T> *parent;
 	RBTNode<T> *grandParent;
 	RBTNode<T> *aunt; // or uncle node
@@ -263,7 +269,7 @@ template<class T>
 RBTNode<T> *RBTree<T>::minNode(RBTNode<T> *p) {
 	RBTNode<T> *min = p;
 
-	// find min key of left side recursively
+	// find min of left side recursively
 	if(p->getLeft() != nullptr) {
 		RBTNode<T> *leftMin = minNode(p->getLeft());
 
@@ -272,7 +278,7 @@ RBTNode<T> *RBTree<T>::minNode(RBTNode<T> *p) {
 		}
 	}
 
-	// find min key of right side recursively
+	// find min of right side recursively
 	if(p->getRight() != nullptr) {
 		RBTNode<T> *rightMin = minNode(p->getRight());
 
@@ -284,7 +290,7 @@ RBTNode<T> *RBTree<T>::minNode(RBTNode<T> *p) {
 	return min;
 }
 
-// returns successor (next key)
+// returns successor (next node)
 template<class T>
 RBTNode<T>* RBTree<T>::getSucc(RBTNode<T> *p) {
 	// if there are nodes directly to the right of tree
@@ -311,8 +317,9 @@ RBTNode<T>* RBTree<T>::getSucc(RBTNode<T> *p) {
 
 template<class T>
 void RBTree<T>::deleteNode(T d) {
-	RBTNode<T> *p = root;
-	RBTNode<T> *targetChild, *target; // target is node to be deleted
+	RBTNode<T> *p = root; // p is used to find node that matches d
+	RBTNode<T> *replace; // node that replaces target when deleted
+	RBTNode<T> *target; // target is node to be deleted
 
 	// use p to see if node to be deleted exists in tree
 	while(p != nullptr) {
@@ -335,27 +342,23 @@ void RBTree<T>::deleteNode(T d) {
 		return;
 	}
 
-	// if p has 0 children
+	// if p has 1 or 0 children, target and p are the same
 	if(p->getLeft() == nullptr || p->getRight() == nullptr) {
 		target = p;
 	}
 
 	// if p has two children, target is successor
 	else {
-		std::cout << "GETTING THE SUCC" << std::endl;
 		target = getSucc(p);
 	}
 
-	std::cout << "target = " << target->getData() << std::endl;
-
+	// if target has two nullptr children, the replacing node will be marked double black
 	if(target->getLeft() == nullptr && target->getRight() == nullptr) {
-		std::cout << "trg has 2 null children" << std::endl;
-		
 		// if target and p is a leaf node
 		if(p == target) {
-			std::cout << "\ttarget = p\n";
 			fixTreeDeletion(p);
 
+			// set the left or right of p to nullptr
 			if(p->getParent()->getLeft() == p) {
 				p->getParent()->setLeft(nullptr);
 			}
@@ -363,94 +366,52 @@ void RBTree<T>::deleteNode(T d) {
 			else {
 				p->getParent()->setRight(nullptr);
 			}
-
-			// recoloring nodes
-			if(p->getParent()->getLeft() != nullptr) {
-				if(p->getParent()->getIsRed() == true && p->getParent()->getLeft()->getIsRed() == true) {
-					p->getParent()->setIsRed(false);
-				}
-			}
-
-			if(p->getParent()->getRight() != nullptr) {
-				if(p->getParent()->getIsRed() == true && p->getParent()->getRight()->getIsRed() == true) {
-					p->getParent()->setIsRed(false);
-				}
-			}
 		}
 
-		// target is a leaf and p has a child
+		// target is a leaf but p is not the same as target
 		else {
 			fixTreeDeletion(target);
 
-			// copy data and set left/right pointers
+			// copy data
 			p->setData(target->getData());
 
-			if(p->getLeft() == target) {
-				p->setLeft(nullptr);
+			// set left/right pointers of target's parent to nullptr
+			if(target->getParent()->getLeft() == target) {
+				target->getParent()->setLeft(nullptr);
 			}
 
 			else {
-				if(p->getRight() == target) {
-					p->setRight(nullptr);
-				}
-
-				else {
-					if(target->getParent()->getRight() == target) {
-						target->getParent()->setRight(nullptr);
-					}
-
-					else {
-						target->getParent()->setLeft(nullptr);
-					}
-				}
-			}
-
-			// recoloring nodes
-			if(p->getLeft() != nullptr) {
-				if(p->getIsRed() == true && p->getLeft()->getIsRed() == true) {
-					p->setIsRed(false);
-				}
-			}
-
-			if(p->getRight() != nullptr) {
-				if(p->getIsRed() == true && p->getRight()->getIsRed() == true) {
-					p->setIsRed(false);
-				}
+				target->getParent()->setRight(nullptr);
 			}
 		}
 	}
 
+	// target is successor
 	else {
-		std::cout << "CHILD CASE\n";
-		// set targetChild
+		// determine node that replaces target
 		if(target->getLeft() != nullptr) {
-			targetChild = target->getLeft();
+			replace = target->getLeft();
 		}
 
 		else {
-			targetChild = target->getRight();
+			replace = target->getRight();
 		}
 	
-
-		// set targetChild's parent to target's parent
-		targetChild->setParent(target->getParent());
-	
+		// set replace's parent to target's parent
+		replace->setParent(target->getParent());
 
 		// repoint root if necessary
 		if(target->getParent() == nullptr) {
-			root = targetChild;
+			root = replace;
 		}
 
-		// fix p's left or right child to targetChild
 		else {
-			// if target is to left of parent, p
 			if(target->getParent()->getLeft() == target) {
-				target->getParent()->setLeft(targetChild);
+				target->getParent()->setLeft(replace);
 			}
 
-			// target is at right of parent, p
 			else {
-				target->getParent()->setRight(targetChild);
+				target->getParent()->setRight(replace);
 			}
 		}
 
@@ -461,7 +422,21 @@ void RBTree<T>::deleteNode(T d) {
 
 		// if target is black, fix tree
 		if(target->getIsRed() == false) {
-			fixTreeDeletion(targetChild);
+			fixTreeDeletion(replace);
+		}
+
+		/*
+		code below: 
+		if target is red or replace is red, recolor replace to black,
+		target is then deleted
+				p 						p(target's data is copied to p)
+			   / \					   / \
+			  b  target(black)		  b  replace(black)
+				  /	\                  \
+				 r	replace(red)        r 
+		*/
+		if(target->getIsRed() == true || replace->getIsRed() == true) {
+			replace->setIsRed(false);
 		}
 	}
 
@@ -470,142 +445,169 @@ void RBTree<T>::deleteNode(T d) {
 
 template<class T>
 void RBTree<T>::fixTreeDeletion(RBTNode<T> *p) {
-	std::cout << "ENTERED FIX TREE DELETION" << std::endl;
+	RBTNode<T> *sibling;
 
-	if(p->getIsRed() == true) {
-		std::cout << "RECOLORED" << std::endl;
-		p->setIsRed(false);
-	}
+	// while p is not root and p is black
+	while(p != root && p->getIsRed() == false) {
+		// (1) determine wheter sibling node of p is right of left of parent
 
+		// if sibling is right of parent
+		if(p->getParent()->getLeft() == p) {
+			sibling = p->getParent()->getRight();
 
-	else {
-		RBTNode<T> *sibling;
-		// while p is not root and p is black
-		while(p != root && p->getIsRed() == false) {
-			// first determine sibling node of p
-			// sibling is right of parent
-			if(p->getParent()->getLeft() == p) {
+			// if sibling node is red, simply recolor
+			if(sibling->getIsRed() == true) {
+				// recolor nodes (sibling becomes black and parent becomes red)
+				sibling->setIsRed(false);
+				p->getParent()->setIsRed(true);
+
+				leftRotate(p->getParent());
+
 				sibling = p->getParent()->getRight();
-				std::cout << "SIBLING ON RIGHT" << std::endl;
-				std::cout << "SIBLING 1xxx === IS: " << sibling->getData() << std::endl;
+			}
 
-				// if sibling node is red
-				if(sibling->getIsRed() == true) {
-					std::cout << "\tSIBLING = RED" << std::endl;
-					// recolor nodes (sibling becomes black and parent becomes red)
-					sibling->setIsRed(false);
-					p->getParent()->setIsRed(true);
+			// if sibling is black and both children are black
+			/*
+			example case where s(b) = sibling(black):
+					r            b
+				   / \          / \
+				s(b)  p       s(r) p
+				 / \          / \
+				b   b        b   b
+			*/
+			if(sibling->getIsRed() == false && (sibling->getLeft() == nullptr || sibling->getLeft()->getIsRed() == false) && (sibling->getRight() == nullptr || sibling->getRight()->getIsRed() == false)) {
+				// color sibling node red
+				sibling->setIsRed(true);
 
-					leftRotate(p->getParent());
-					sibling = p->getParent()->getRight();
+				// if sibling's parent is red, color it black and break out of loop
+				if(sibling->getParent() != nullptr && sibling->getParent()->getIsRed() == true) {
+					sibling->getParent()->setIsRed(false);
+					break;
 				}
 
-				// if sibling is black and both children are black
-				if(sibling->getIsRed() == false && (sibling->getLeft() == nullptr || sibling->getLeft()->getIsRed() == false) && (sibling->getRight() == nullptr || sibling->getRight()->getIsRed() == false)) {
-					std::cout << "\nSIBLING + 2 CHILD = BLACK" << std::endl;
-					// color sibling node red
-					sibling->setIsRed(true);
-
-					// recur up tree
-					p = p->getParent();
-				}
-
-				// sibling is black
 				else {
-					std::cout << "\tSIBLING IS BLACK\n";
-					// right-left case
-					if(sibling->getRight() != nullptr && sibling->getRight()->getIsRed() == false) {
-						std::cout << "\tRL CASE" << std::endl;
-						rightRotate(sibling);
-
-						sibling = p->getParent()->getRight();
-					}
-
-					// right-right case
-					std::cout << "\tRR CASE" << std::endl;
-					// color sibling to p's color
-					sibling->setIsRed(p->getParent()->getIsRed());
-					p->getParent()->setIsRed(false);
-
-					// make sure sibling's nodes are recolored correctly
-					if(sibling->getRight() != nullptr) {
-						if(sibling->getRight()->getIsRed() == true) {
-							sibling->getRight()->setIsRed(false);
-						}
-					}
-
-					if(sibling->getLeft() != nullptr) {
-						if(sibling->getLeft()->getIsRed() == true) {
-							sibling->getLeft()->setIsRed(false);
-						}
-					}
-
-					leftRotate(p->getParent());
-
-					p = root;
+					p = p->getParent(); // recur up tree
 				}
 			}
 
-			// sibling is left of parent
+			// sibling is black and one of sibling's child is red
 			else {
+				// right-left case
+				// if sibling's left child is red
+				/*
+				example of right-left case:
+				right rotate sibling,
+				sibling moves to p's parent's right
+				recolor sibling to same color as p's parent
+				left rotate p's parent
+				delete p
+					b          b             s(r)           s(b) (recolored sibling)
+				   / \        / \            / \			/ \
+				  p  s(b)    p   s(r)       b   b          b   b
+				     /            \        /              /
+				    r             b       p         (deleted p)
+				*/
+				if(sibling->getLeft() != nullptr && sibling->getLeft()->getIsRed() == true) {
+					rightRotate(sibling);
+					sibling = p->getParent()->getRight();
+				}
+
+				// if the above code is not executed
+				// it becomes just a right-right case
+				// color sibling to p's parent's color
+				sibling->setIsRed(p->getParent()->getIsRed());
+
+				// p's parent will become left child after rotation
+				p->getParent()->setIsRed(false); // make p's parent black
+
+				// check right child to make sure it is black also
+				if(sibling->getRight() != nullptr && sibling->getRight()->getIsRed() == true) {
+					sibling->getRight()->setIsRed(false);
+				}
+
+				leftRotate(p->getParent());
+				p = root;
+			}
+		}
+
+		// sibling is left of parent
+		else {
+			sibling = p->getParent()->getLeft();
+
+			// if sibling node is red
+			if(sibling->getIsRed() == true) {
+				// recolor nodes (sibling becomes black and parent becomes red)
+				sibling->setIsRed(false);
+				p->getParent()->setIsRed(true);
+
+				rightRotate(p->getParent());
+
 				sibling = p->getParent()->getLeft();
-				std::cout << "SIBLING ON LEFT" << std::endl;
-				std::cout << "SIBLING IS: " << sibling->getData() << std::endl;
-				// if sibling node is red
-				if(sibling->getIsRed() == true) {
-					std::cout << "\tSIBLING = RED\n";
-					// recolor nodes (sibling becomes black and parent becomes red)
-					sibling->setIsRed(false);
-					p->getParent()->setIsRed(true);
+			}
 
-					rightRotate(p->getParent());
+			// if sibling is black and both children are black
+			if(sibling->getIsRed() == false && (sibling->getLeft() == nullptr || sibling->getLeft()->getIsRed() == false) && (sibling->getRight() == nullptr || sibling->getRight()->getIsRed() == false)) {
+				// color sibling node red
+				sibling->setIsRed(true);
 
+				// if sibling's parent is red, color it black and break out of loop
+				if(sibling->getParent() != nullptr && sibling->getParent()->getIsRed() == true) {
+					sibling->getParent()->setIsRed(false);
+					break;
+				}
+
+				else {
+					p = p->getParent(); // recur up tree
+				}
+			}
+
+			// sibling is black and sibling has one red child
+			else {
+				// left-right case
+				// if sibling's right child is red
+				/*
+				example of left-right case:
+				left rotate sibling
+				sibling moves to p's parent's left 
+				sibling's color becomes same color as p's parent and make left child black
+				right rotate p's parent
+				delete p
+					b          b          s(r)         s(b) (recolored sibling)
+				   / \        / \         / \          / \
+				 s(b) p     s(r) p       b   b        b   b
+				    \       /                 \             \
+				     r     b                   p          (deleted p)
+				*/
+				if(sibling->getRight() != nullptr && sibling->getRight()->getIsRed() == true) {
+					leftRotate(sibling);
 					sibling = p->getParent()->getLeft();
 				}
 
-				// if sibling is black and both children are black
-				if(sibling->getIsRed() == false && (sibling->getLeft() == nullptr || sibling->getLeft()->getIsRed() == false) && (sibling->getRight() == nullptr || sibling->getRight()->getIsRed() == false)) {
-					std::cout << "\tSIBLING + 2 CHILD = BLACK\n";
-					// color sibling node red
-					sibling->setIsRed(true);
+				// if above code is not executed
+				// it becomes just a left-left case
+				// color sibling node the same as p's parent and sibling's parent to black
+				sibling->setIsRed(p->getParent()->getIsRed());
 
-					// recur up tree
-					p = p->getParent();
+				// parent will become right child after rotation
+				sibling->getParent()->setIsRed(false);
+
+				// color left sibling children black
+				if(sibling->getLeft() != nullptr && sibling->getLeft() != nullptr) {
+					sibling->getLeft()->setIsRed(false);
 				}
 
-				// if sibling is black
-				else {
-					std::cout << "SIBLING IS BLACK\n";
-					// left-right case
-					if(sibling->getLeft() != nullptr && sibling->getLeft()->getIsRed() == false) {
-						std::cout << "\tLR CASE\n";
-						sibling->getRight()->setIsRed(false);
-						sibling->setIsRed(true);
-						leftRotate(sibling);
-
-						sibling = p->getParent()->getLeft();
-					}
-
-					// left-left case if above code is not executed
-					std::cout << "\tLL CASE\n";
-					sibling->setIsRed(p->getParent()->getIsRed());
-					p->getParent()->setIsRed(false);
-					if(sibling->getLeft() != nullptr) {
-						sibling->getLeft()->setIsRed(false);
-					}
-					rightRotate(p->getParent());
-					p = root;
-				}
+				rightRotate(p->getParent());
+				p = root;
 			}
 		}
 	}
 	
-	root->setIsRed(false);
+	root->setIsRed(false); // make sure root is black
 }
 
-// prints binary tree (pass in root to print entire tree) in levelorder scan/travesal
+// prints binary tree in levelorder scan/travesal
 template<class T>
-void RBTree<T>::print(RBTNode<T> *p) {
+void RBTree<T>::print() {
 	if(root == nullptr) {
 		return;
 	}
@@ -618,7 +620,7 @@ void RBTree<T>::print(RBTNode<T> *p) {
 		q.pop(); // remove first element in queue
 
 		std::cout << currNode->getData() << " "; // print out data
-		std::cout << "red?: " << currNode->getIsRed() << std::endl;
+		std::cout << "isRed?: " << currNode->getIsRed() << std::endl;
 
 		// if there is a node left of p, push into queue
 		if(currNode->getLeft() != nullptr) {
@@ -629,6 +631,16 @@ void RBTree<T>::print(RBTNode<T> *p) {
 		if(currNode->getRight()!= nullptr) {
 			q.push(currNode->getRight());
 		}
+	}
+}
+
+// deletes tree from bottom up
+template<class T>
+void RBTree<T>::deleteTree(RBTNode<T> *p) {
+	if(p != nullptr) {
+		deleteTree(p->getLeft());
+		deleteTree(p->getRight());
+		delete p;
 	}
 }
 
