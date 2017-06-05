@@ -94,7 +94,7 @@ AVLNode<T>* AVLTree<T>::leftRotate(AVLNode<T> *p) {
 	AVLNode<T> *b = a->getLeft();
 	AVLNode<T> *parentOfP = p->getParent();
 
-	// rotate nodes
+	// rotate nodes by rearranging pointers
 	p->setRight(b);
 	p->setParent(a);
 	a->setParent(parentOfP);
@@ -104,13 +104,16 @@ AVLNode<T>* AVLTree<T>::leftRotate(AVLNode<T> *p) {
 		b->setParent(p);
 	}
 
-	if(parentOfP != nullptr) {
+	if(parentOfP == nullptr) {
+		root = a;
+	}
+
+	else if(parentOfP->getRight() == p) {
 		parentOfP->setRight(a);
 	}
 
-	// check to see if p is root
-	if(p == root) {
-		root = a;
+	else {
+		parentOfP->setLeft(a);
 	}
 
 	return a;
@@ -132,7 +135,7 @@ AVLNode<T>* AVLTree<T>::rightRotate(AVLNode<T> *p) {
 	AVLNode<T> *b = a->getRight();
 	AVLNode<T> *parentOfP = p->getParent();
 
-	// rotate nodes
+	// rotate nodes by rearranging pointers
 	p->setParent(a);
 	p->setLeft(b);
 	a->setRight(p);
@@ -141,14 +144,17 @@ AVLNode<T>* AVLTree<T>::rightRotate(AVLNode<T> *p) {
 	if(b != nullptr) {
 		b->setParent(p);
 	}
-	
-	if(parentOfP != nullptr) {
-		parentOfP->setLeft(a);
+
+	if(parentOfP == nullptr) {
+		root = a;
 	}
 
-	// check to see if p is root
-	if(p == root) {
-		root = a;
+	else if(parentOfP->getRight() == p) {
+		parentOfP->setRight(a);
+	}
+
+	else {
+		parentOfP->setLeft(a);
 	}
 
 	return a;
