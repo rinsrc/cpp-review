@@ -32,7 +32,7 @@ public:
 	BSTNode<K, V> *getSucc(BSTNode<K, V> *p);
 	BSTNode<K, V> *getPred(BSTNode<K, V> *p);
 	bool isBST(BSTNode<K, V> *p);
-	void print(BSTNode<K, V> *p);
+	void print();
 	void deleteTree(BSTNode<K, V> *p);
 };
 
@@ -261,7 +261,6 @@ BSTNode<K, V>* BSTree<K, V>::deleteKey(BSTNode<K, V> *p, K k) {
 
 			p->setKey(temp->getKey());
 			p->setValue(temp->getValue());
-			std::cout << "X: " << temp->getKey() << std::endl;
 
 			// set p's right by recursively deleting node again (will either have one or no child)
 			p->setRight(deleteKey(p->getRight(), temp->getKey()));
@@ -340,9 +339,9 @@ bool BSTree<K, V>::isBST(BSTNode<K, V>* p) {
 	return true;
 }
 
-// prints binary tree (pass in root to print entire tree) using level order scan/travesal
+// prints binary tree using level order scan/travesal
 template<class K, class V>
-void BSTree<K, V>::print(BSTNode<K, V> *p) {
+void BSTree<K, V>::print() {
 	std::queue<BSTNode<K, V>*> q; // this queue will store pointers of tree
 	q.push(root); // push in root node first
 

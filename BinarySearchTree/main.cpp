@@ -22,7 +22,7 @@ int main() {
 	tree->insert(tree->getRoot(), 20, 1000);
 
 	std::cout << "Printing tree in order:" << std::endl;
-	tree->print(tree->getRoot());
+	tree->print();
 	std::cout << std::endl;
 
 	std::cout << std::endl << "Searching for key 23:" << std::endl;
@@ -31,7 +31,7 @@ int main() {
 
 	std::cout << std::endl << "Deleting max key and reprinting tree:" << std::endl;
 	tree->deleteMax();
-	tree->print(tree->getRoot());
+	tree->print();
 	std::cout << std::endl;
 
 	/* 
@@ -49,7 +49,7 @@ int main() {
 
 	std::cout << std::endl << "Deleting node with key 20 and reprinting tree:" << std::endl;
 	tree->deleteKey(tree->getRoot(), 20);
-	tree->print(tree->getRoot());
+	tree->print();
 	std::cout << std::endl;
 	
 	/* 

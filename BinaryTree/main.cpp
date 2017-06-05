@@ -24,7 +24,7 @@ int main() {
 
 	// print tree in order
 	std::cout << "Printing tree: " << std::endl;
-	tree->print(tree->getRoot());
+	tree->print();
 	
 	// calculate number of nodes in tree
 	std::cout << std::endl;
@@ -50,7 +50,7 @@ int main() {
 	std::cout << std::endl;
 	std::cout << "Mirroring tree: "<< std::endl;
 	tree->mirror(tree->getRoot());
-	tree->print(tree->getRoot());
+	tree->print();
 	
 	/* 
 		mirrored tree should now look like this:
@@ -72,7 +72,7 @@ int main() {
 	std::cout << std::endl << std::endl;
 	std::cout << "Swimming 2nd left child up tree: " << std::endl;
 	tree->swim(p);
-	tree->print(tree->getRoot());
+	tree->print();
 
 	/* 
 		after swimming 2nd left child, tree should look like this:
@@ -88,7 +88,7 @@ int main() {
 	BTNode<int> *rightChild = tree->getRoot()->getRight();
 	std::cout << "Sinking 1st right child (data value = " << rightChild->getData() << ") down tree:" << std::endl;
 	tree->sink(rightChild);
-	tree->print(tree->getRoot());
+	tree->print();
 
 	/* 
 		after sinking 1st right child of root, tree should look like this:
